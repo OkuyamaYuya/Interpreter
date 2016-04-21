@@ -10,3 +10,4 @@ data EXP = NAT Int | B Bool | VAL String
          | REC  {f::String, ty::TY, val::String, e::EXP, in_::EXP}
          | EOF
          deriving (Show,Read)
+
