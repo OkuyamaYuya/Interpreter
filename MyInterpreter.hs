@@ -23,7 +23,6 @@ eval_ = \e -> \env -> case e of
   IF c t f-> case eval_ c env of
       BB True  -> eval_ t env
       BB False -> eval_ f env
-      _        -> ERR "type error"
   ABS x _ e -> CLOSURE env x e
   APP e1 e2 -> let v1 = eval_ e1 env in case v1 of
       CLOSURE env_ x e3 -> let v2 = eval_ e2 env in eval_ e3 (envAdd x v2 env_)
@@ -36,7 +35,6 @@ eval_ = \e -> \env -> case e of
       MINUS -> v1`minus`v2
       EQU   -> v1`equ`v2
       AND   -> v1`andd`v2
-  _     -> ERR "operational error"
 plus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a+b
 minus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a-b
 equ = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in BB $ a==b
