@@ -1,47 +1,37 @@
-module MyParser(parseFile,parseStr) where
+module MyParser(parseFile,parseStr,parseIO,print_parser) where
 
+import MyDataTypes
 import Text.Parsec
 import System.Environment (getArgs)
 import Data.Char
 import Control.Applicative ((<$>), (<*>), (*>), (<*))
 
-data TY  = INT | BOOL | FUN TY TY deriving (Show,Read)
-data OP  = PLUS | MINUS | EQU | AND deriving (Show,Read)
-data EXP = NAT Int | B Bool | VAL String 
-         | PRIM EXP OP EXP | APP EXP EXP
-         | IF {cond::EXP, tru::EXP, fal::EXP} 
-         | ABS {val::String, ty::TY, e::EXP} 
-         | BIND {val::String, ty::TY, e::EXP, in_::EXP}
-         | REC  {f::String, ty::TY, val::String, e::EXP, in_::EXP}
-         | EOF
-         deriving (Show,Read)
-
 -- 予約語
 reversedList = ["&&","==","in","else","then"]
 -- ファイル読み込み
-parseFile = \s -> readFile s >>= parseStr
+parseFile = \s -> parseStr <$> readFile s
 -- 構文解析
-parseStr = parseTest expr
+parseStr = parse expr "syntax error"
+parseIO = parseTest expr
 -- 全体
-expr = exprAp
--- 関数適用
-exprAp = do
-  e1 <- exprOp
-  e2 <- exprOp
-  case e2 of
-    EOF -> return e1
-    _   -> return $ APP e1 e2
+expr = exprOp
 -- 二項演算子
--- 演算子の優先順位についてはまだ
--- 結合がおかしい ( +,-が右結合になっている
+-- 結合がおかしい +,-が右結合になっている
 exprOp = do
-  e <- expr_
+  e <- exprAp
   (PRIM e <$>
      (string "+"  *> pure PLUS  <|>
       string "-"  *> pure MINUS <|>
       string "&&" *> pure AND   <|>
       string "==" *> pure EQU)  <*> exprOp)
       <|> pure e
+-- 関数適用
+exprAp = do
+  e1 <- expr_
+  e2 <- expr_
+  case e2 of
+    EOF -> return e1
+    _   -> return $ APP e1 e2
 -- もろもろ
 expr_ = do
   get_tkn >>= parseExp
@@ -76,12 +66,15 @@ isNum :: String -> Bool
 isNum = all isDigit
 isBool :: String -> Bool
 isBool = \s -> if s == "True" || s == "False" then True else False
--- main ::IO()
--- main = do
-  -- (head <$> getArgs) >>= parseFile
+
+print_parser = \s -> case s of
+  Right a -> print a
+  Left  a -> print a
+
+main ::IO()
+main = do
   -- 型は大文字で書く ex. INT,BOOL,INT->BOOL
-  -- parseStr "if T then f 1 else f 0"
-  -- parseStr "f (1+2) + 3"
-  -- parseStr "((lambda x:INT . lambda y:INT . x + y) 3) 4"
-  -- parseStr "(lambda x:INT . lambda y:INT . x + y) 3 4"
-  -- parseStr "fun (f:INT->INT) n = f n in f 3"
+  -- (head <$> getArgs) >>= parseFile >>= print_parser
+  print_parser $ parseStr "f 1 2"
+  print_parser $ parseStr "((lambda x:INT . lambda y:INT . x + y) 3) 4"
+  print_parser $ parseStr "(lambda x:INT . lambda y:INT . x + y) 3 4"
