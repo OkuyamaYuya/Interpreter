@@ -42,9 +42,6 @@ minus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a-b
 equ = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in BB $ a==b
 andd = \v1 -> \v2 -> let (BB a,BB b) = (v1,v2) in BB $ a&&b
 
-cls :: ENV -> String -> EXP -> VALUE
-cls env x e = ERR ""
-
 envLook :: EXP -> ENV -> VALUE
 envLook (VAL str) env =
   case Map.lookup str env of

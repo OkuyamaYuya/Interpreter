@@ -1,6 +1,6 @@
 module MyDataTypes where
 
-data TY  = INT | BOOL | FUN TY TY deriving (Show,Read)
+data TY  = INT | BOOL | FUN TY TY | BOTTOM String deriving (Show,Read,Eq)
 data OP  = PLUS | MINUS | EQU | AND deriving (Show,Read)
 data EXP = NAT Int | B Bool | VAL String 
          | PRIM EXP OP EXP | APP EXP EXP
