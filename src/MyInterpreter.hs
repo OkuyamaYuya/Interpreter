@@ -25,16 +25,21 @@ eval_ = \e -> \env -> case e of
       BB False -> eval_ f env
   ABS x _ e -> CLOSURE env x e
   APP e1 e2 -> let v1 = eval_ e1 env in case v1 of
-      CLOSURE env_ x e3 -> let v2 = eval_ e2 env in eval_ e3 (envAdd x v2 env_)
-      RECCLOS env_ f x e3 -> let v2 = eval_ e2 env in eval_ e3 (envAdd f v1 . envAdd x v2 $ env_)
+      CLOSURE env_ x e3 -> let v2 = eval_ e2 env 
+                           in eval_ e3 (envAdd x v2 env_)
+      RECCLOS env_ f x e3 -> let v2 = eval_ e2 env 
+                             in eval_ e3 (envAdd f v1 . envAdd x v2 $ env_)
   REC f _ x e1 e2 -> eval_ e2 (envAdd f (RECCLOS env f x e1) env)
-  BIND x _ e1 e2 -> let v1 = eval_ e1 env in eval_ e2 (envAdd x v1 env)
-  PRIM e1 op e2 -> let (v1,v2) = (eval_ e1 env, eval_ e2 env) in
-    case op of
-      PLUS  -> v1`plus`v2
-      MINUS -> v1`minus`v2
-      EQU   -> v1`equ`v2
-      AND   -> v1`andd`v2
+  BIND x _ e1 e2 -> let v1 = eval_ e1 env 
+                    in eval_ e2 (envAdd x v1 env)
+  PRIM e1 op e2 -> let (v1,v2) = (eval_ e1 env, eval_ e2 env) 
+                   in
+                    case op of
+                      PLUS  -> v1`plus`v2
+                      MINUS -> v1`minus`v2
+                      EQU   -> v1`equ`v2
+                      AND   -> v1`andd`v2
+
 plus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a+b
 minus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a-b
 equ = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in BB $ a==b

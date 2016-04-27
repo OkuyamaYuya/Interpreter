@@ -1,5 +1,4 @@
 -- Main
-import Text.Parsec.Error
 import MyParser
 import MyTypecheck
 import MyDataTypes

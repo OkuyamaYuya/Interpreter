@@ -75,6 +75,7 @@ main ::IO()
 main = do
   -- 型は大文字で書く ex. INT,BOOL,INT->BOOL
   -- (head <$> getArgs) >>= parseFile >>= print_parser
+  print_parser $ parseStr "1+2-3"
   print_parser $ parseStr "f 1 2"
   print_parser $ parseStr "((lambda x:INT . lambda y:INT . x + y) 3) 4"
   print_parser $ parseStr "(lambda x:INT . lambda y:INT . x + y) 3 4"
