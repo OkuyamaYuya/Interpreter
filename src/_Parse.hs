@@ -1,6 +1,6 @@
-module MyParser(parseFile,parseStr,parseIO,print_parser) where
+module Parse(parseFile,parseStr,parseIO,print_parser) where
 
-import MyDataTypes
+import Syntax
 import Text.Parsec
 import System.Environment (getArgs)
 import Data.Char
@@ -75,7 +75,5 @@ main ::IO()
 main = do
   -- 型は大文字で書く ex. INT,BOOL,INT->BOOL
   -- (head <$> getArgs) >>= parseFile >>= print_parser
-  print_parser $ parseStr "1+2-3"
-  print_parser $ parseStr "f 1 2"
-  print_parser $ parseStr "((lambda x:INT . lambda y:INT . x + y) 3) 4"
-  print_parser $ parseStr "(lambda x:INT . lambda y:INT . x + y) 3 4"
+  print_parser $ parseStr "val x : (INT->INT)->INT = 1 in x"
+  -- print_parser $ parseStr "(lambda x:INT . lambda y:INT . x + y) 3 4"
