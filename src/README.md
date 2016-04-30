@@ -1,3 +1,3 @@
 ### Syntax
 
-![syntax](http://i.imgur.com/60a8kq9.png)
+![syntax](http://i.imgur.com/b5TPrU0.png)
