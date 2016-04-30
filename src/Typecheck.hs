@@ -2,15 +2,17 @@ module Typecheck (tycheckFile,tycheck) where
 
 import Syntax
 import Parse
+import Lex
+import Base
 import Data.Map as Map
 
 type ENV_ty = Map String TY
 
-tycheckFile = \s -> tycheck.parseStr <$> readFile s
+tycheckFile = \s -> tycheck.parse.scanTokens <$> readFile s
 
 tycheck = \s -> case s of
-  Left err -> BOTTOM "syntax error"
-  Right e  -> tycheck_ e (Map.empty)
+  Reject err -> BOTTOM "syntax error"
+  Accept e  -> tycheck_ e (Map.empty)
 
 tycheck_ = \e -> \env -> case e of
   NAT n -> INT
@@ -31,16 +33,30 @@ tycheck_ = \e -> \env -> case e of
                     FUN t1 t2 -> let t3 = tycheck_ e2 env in
                                   if t1 == t3 then t2 else BOTTOM "apply e1 e2 : types not match"
                     _ -> BOTTOM "apply e1 e2 : types not match"
-  PRIM e1 op e2 -> let (t1,t2) = (tycheck_ e1 env,tycheck_ e2 env) in
-    case op of
-      PLUS  -> if (t1,t2) == (INT,INT) then INT else BOTTOM "(+)::INT->INT->INT"
-      MINUS -> if (t1,t2) == (INT,INT) then INT else BOTTOM "(-)::INT->INT->INT"
-      EQU   -> if t1 == t2 then BOOL else BOTTOM "(==)::a->a->BOOL"
-      AND   -> if t1 == t2 then BOOL else BOTTOM "(&&)::INT->INT->INT"
+  PLUS  e1 e2 -> if (tycheck_ e1 env,tycheck_ e2 env) == (INT,INT) 
+                  then INT 
+                  else BOTTOM "(+)::INT->INT->INT"
+  MINUS e1 e2 -> if (tycheck_ e1 env,tycheck_ e2 env) == (INT,INT) 
+                  then INT 
+                  else BOTTOM "(-)::INT->INT->INT"
+  TIMES e1 e2 -> if (tycheck_ e1 env,tycheck_ e2 env) == (INT,INT) 
+                  then INT 
+                  else BOTTOM "(*)::INT->INT->INT"
+  EQU e1 e2  -> if (tycheck_ e1 env) == (tycheck_ e2 env) 
+                  then BOOL 
+                  else BOTTOM "(==)::a->a->BOOL"
+  AND e1 e2  -> let t1 = tycheck_ e1 env in
+                  if t1 == (tycheck_ e2 env) && t1 == BOOL 
+                    then BOOL 
+                    else BOTTOM "(&&)::BOOL->BOOL->BOOL"
+  OR  e1 e2  -> let t1 = tycheck_ e1 env in
+                  if t1 == (tycheck_ e2 env) && t1 == BOOL 
+                    then BOOL 
+                    else BOTTOM "(||)::BOOL->BOOL->BOOL"
   _ -> BOTTOM ""
 
 envLook :: EXP -> ENV_ty -> TY
-envLook (VAL str) env =
+envLook (VAR str) env =
   case Map.lookup str env of
     Just a -> a
     _      -> BOTTOM "not in scope"
@@ -50,5 +66,8 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  -- print $ tycheck $ parseStr "fun (f:INT->INT) x = if x==0 then 1 else if x==1 then 1 else f(x-1) + f(x-2) in f 6"
+  print $ tycheck.parse.scanTokens $ "let rec (f:Int->Int) x = if x == 0 then 1 else if x==1 then 1 else 0 in f 6"
+  print $ tycheck.parse.scanTokens $ "let rec (f:Int->Int) x = f (x-1) in f 6"
+  print $ tycheck.parse.scanTokens $ "\\x:Int.x"
+  print $ tycheck.parse.scanTokens $ "let x:Int = if True then 1 else 0 in x + 100"
   print 0

@@ -1,5 +1,7 @@
 module Evaluation (evalFile,eval) where
 
+import Base
+import Lex
 import Parse
 import Syntax
 import Data.Map as Map
@@ -10,11 +12,11 @@ data VALUE = NN Int | BB Bool | CLOSURE {env::ENV, var::String, e::EXP}
                               | ERR String deriving (Show)
 type ENV   = Map String VALUE
 
-evalFile = \s -> eval.parseStr <$> readFile s
+evalFile = \s -> eval.parse.scanTokens <$> readFile s
 
 eval = \s -> case s of
-  Left err -> ERR "syntax error"
-  Right e  -> eval_ e (Map.empty)
+  Reject err -> ERR "syntax error"
+  Accept e  -> eval_ e (Map.empty)
 
 eval_ = \e -> \env -> case e of
   NAT n   -> NN n
@@ -32,18 +34,21 @@ eval_ = \e -> \env -> case e of
   REC f _ x e1 e2 -> eval_ e2 (envAdd f (RECCLOS env f x e1) env)
   BIND x _ e1 e2 -> let v1 = eval_ e1 env 
                     in eval_ e2 (envAdd x v1 env)
-  PRIM e1 op e2 -> let (v1,v2) = (eval_ e1 env, eval_ e2 env) 
-                   in
-                    case op of
-                      PLUS  -> v1`plus`v2
-                      MINUS -> v1`minus`v2
-                      EQU   -> v1`equ`v2
-                      AND   -> v1`andd`v2
+  PLUS  e1 e2 -> plus  (eval_ e1 env) (eval_ e2 env)
+  MINUS e1 e2 -> minus (eval_ e1 env) (eval_ e2 env)
+  TIMES e1 e2 -> times (eval_ e1 env) (eval_ e2 env)
+  EQU   e1 e2 -> equ   (eval_ e1 env) (eval_ e2 env)
+  AND   e1 e2 -> andd  (eval_ e1 env) (eval_ e2 env)
+  OR    e1 e2 -> orr   (eval_ e1 env) (eval_ e2 env)
 
-plus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a+b
-minus = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in NN $ a-b
-equ = \v1 -> \v2 -> let (NN a,NN b) = (v1,v2) in BB $ a==b
-andd = \v1 -> \v2 -> let (BB a,BB b) = (v1,v2) in BB $ a&&b
+plus  v1 v2 = let (NN a,NN b) = (v1,v2) in NN $ a+b
+minus v1 v2 = let (NN a,NN b) = (v1,v2) in NN $ a-b
+times v1 v2 = let (NN a,NN b) = (v1,v2) in NN $ a*b
+andd  v1 v2 = let (BB a,BB b) = (v1,v2) in BB $ a&&b
+orr   v1 v2 = let (BB a,BB b) = (v1,v2) in BB $ a||b
+equ   v1 v2 = case (v1,v2) of
+                (NN a,NN b) -> BB $ a==b
+                (BB a,BB b) -> BB $ a==b
 
 envLook :: EXP -> ENV -> VALUE
 envLook (VAR str) env =
@@ -56,7 +61,5 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  -- 静的スコープにしたい
-  -- フィボナッチ数列
-  -- print $ eval $ parseStr "fun (f:INT->INT) x = if x==0 then 1 else if x==1 then 1 else f(x-1) + f(x-2) in f 6"
+  print $ eval.parse.scanTokens $ "let rec (f:Int->Int) x = if x==0 then 1 else if x==1 then 1 else f(x-1) + f(x-2) in f 6"
   print 0

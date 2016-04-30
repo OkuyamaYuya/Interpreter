@@ -1,13 +1,13 @@
-all: Sfl
+all: Main
 
 Lex.hs : Lex.x
 	alex Lex.x
 
-Happy.hs : Happy.y
-	happy Happy.y
+Parse.hs : Parse.y
+	happy Parse.y
     
-Sfl : Main.hs
+Main : Lex.hs Parse.hs Main.hs
 	ghc --make Main
     
 clean:
-	rm -f *.o *.hi
+	rm -f *.o *.hi Parse.hs Lex.hs

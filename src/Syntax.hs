@@ -6,19 +6,15 @@ data TY  = INT
          | BOTTOM String 
            deriving (Show,Read,Eq)
 
-data OP  = PLUS 
-         | MINUS
-         | TIMES
-         | DIV
-         | EQU 
-         | AND 
-         | OR
-           deriving (Show,Read)
-
 data EXP = NAT Int 
          | B Bool
          | VAR String 
-         | PRIM EXP OP EXP
+         | PLUS EXP EXP
+         | MINUS EXP EXP
+         | TIMES EXP EXP
+         | EQU  EXP EXP
+         | AND  EXP EXP
+         | OR EXP EXP
          | APP EXP EXP
          | IF {cond::EXP, tru::EXP, fal::EXP} 
          | ABS {var::String, ty::TY, e::EXP} 

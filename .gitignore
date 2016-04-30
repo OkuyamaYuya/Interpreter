@@ -11,3 +11,9 @@ samples/mincaml/Parser.hs
 samples/mincaml/Syntax.hs
 samples/mincaml/Token.hs
 samples/mincaml/Tokenizer.hs
+code/testfile00.ml
+code/testfile01.ml
+code/testfile02.ml
+code/testfile04.ml
+code/testfile05.ml
+code/testfile06.ml

@@ -21,7 +21,6 @@ tokens :-
     "-" { \s -> T.Minus }
     "+" { \s -> T.Plus }
     "*" { \s -> T.Times }
-    "/" { \s -> T.Div }
     "==" { \s -> T.Eq }
     "||" { \s -> T.Or }
     "&&" { \s -> T.And }

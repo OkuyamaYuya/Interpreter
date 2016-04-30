@@ -20,7 +20,6 @@ import qualified Token as T
   '-' { T.Minus }
   '+' { T.Plus }
   '*' { T.Times }
-  '/' { T.Div }
   '=='  { T.Eq }
   '&&'  { T.And }
   '||'  { T.Or }
@@ -44,13 +43,17 @@ import qualified Token as T
 
 %%
 
-Exp : Exp '+' Exp             { S.PRIM $1 S.PLUS $3 }
-    | Exp '-' Exp             { S.PRIM $1 S.MINUS $3 }
-    | Exp '*' Exp             { S.PRIM $1 S.TIMES $3 }
-    | Exp '/' Exp             { S.PRIM $1 S.DIV $3 }
-    | Exp '&&' Exp            { S.PRIM $1 S.AND $3 }
-    | Exp '||' Exp            { S.PRIM $1 S.OR  $3 }
-    | Exp '==' Exp            { S.PRIM $1 S.EQU $3 }
+Main : Exp { $1 }
+
+Exp : Exp_ { $1 }
+     | Exp Exp_ { S.APP $1 $2 }
+
+Exp_ : Exp '+' Exp             { S.PLUS  $1  $3 }
+    | Exp '-' Exp             { S.MINUS $1  $3 }
+    | Exp '*' Exp             { S.TIMES $1  $3 }
+    | Exp '&&' Exp            { S.AND   $1  $3 }
+    | Exp '||' Exp            { S.OR    $1  $3 }
+    | Exp '==' Exp            { S.EQU   $1  $3 }
     | '(' Exp ')'             { $2 }
     | int                     { S.NAT $1 }
     | var                     { S.VAR $1 }
