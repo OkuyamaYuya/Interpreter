@@ -1,2 +1,2 @@
 ### Interpreter for simple functional language
-subtyping , cast , refinement type , dependent function type を追加していくつもり
+I will add subtyping , cast , refinement type , dependent function type ...
