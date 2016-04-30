@@ -7,9 +7,12 @@ data TY  = INT
            deriving (Show,Read,Eq)
 
 data OP  = PLUS 
-         | MINUS 
+         | MINUS
+         | TIMES
+         | DIV
          | EQU 
          | AND 
+         | OR
            deriving (Show,Read)
 
 data EXP = NAT Int 

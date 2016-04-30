@@ -22,7 +22,7 @@ data Token = Let
            | TyBool
            | Arrow
            | Lambda
-           | Comma
+           | Dot
            | Colon
-           | Bind
+           | Assign
            deriving (Show,Eq)
