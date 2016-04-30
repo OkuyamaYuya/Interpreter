@@ -1,4 +1,5 @@
--- Main
+module Main where
+
 import MyParser
 import MyTypecheck
 import MyDataTypes
