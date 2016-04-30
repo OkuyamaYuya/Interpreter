@@ -1,15 +1,6 @@
 ### Syntax
 
-\begin{eqnarray}
-e &::=& ... \\
-  &|& lambda\ x:\tau\ .\ e \\
+<br>
 
-  &|& val\ x:\tau\ =\ e\ in\ e \\
+![syntax](http://i.imgur.com/gfJt6Ea.png)
 
-  &|& fun\ (f:\tau)\ x\ =\ e\ in\ e \\ \\
-
-\tau &:=& INT \\
-     &|& BOOL \\
-     &|& \tau \to \tau
-
-\end{eqnarray}
