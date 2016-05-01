@@ -2,4 +2,4 @@
 
 <br>
 
-![syntax](http://i.imgur.com/b5TPrU0.png)
+![syntax](http://i.imgur.com/YNqGRvS.png)

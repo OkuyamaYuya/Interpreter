@@ -60,8 +60,8 @@ Exp_ : Exp '+' Exp             { S.PLUS  $1  $3 }
     | bool                    { S.B $1 }
     | lambda var ':' Type '.' Exp           { S.ABS $2 $4 $6 }
     | if Exp then Exp else Exp              { S.IF $2 $4 $6 }
+    | let rec var var ':' Type '=' Exp in Exp { S.REC $3 $6 $4 $8 $10 }
     | let var ':' Type '=' Exp in Exp       { S.BIND $2 $4 $6 $8 }
-    | let rec '(' var ':' Type ')' var '=' Exp in Exp { S.REC $4 $6 $8 $10 $12 }
 
 Type : tyInt  { S.INT }
      | tyBool { S.BOOL }
