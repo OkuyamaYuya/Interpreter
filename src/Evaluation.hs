@@ -7,9 +7,13 @@ import Syntax
 import Data.Map as Map
 import Debug.Trace
 -- for debug : trace str -> a -> a
-data VALUE = NN Int | BB Bool | CLOSURE {env::ENV, var::String, e::EXP}
-                              | RECCLOS {env::ENV, f::String, var::String, e::EXP}
-                              | ERR String deriving (Show)
+data VALUE = NN Int
+           | BB Bool
+           | LL [VALUE]
+           | CLOSURE {env::ENV, var::String, e::EXP}
+           | RECCLOS {env::ENV, f::String, var::String, e::EXP}
+           | ERR String 
+           deriving (Show)
 type ENV   = Map String VALUE
 
 evalFile = \s -> eval.parse.scanTokens <$> readFile s
@@ -22,6 +26,10 @@ eval_ = \e -> \env -> case e of
   NAT n   -> NN n
   B   b   -> BB b
   VAR x   -> envLook (VAR x) env
+  LIST (e1:rest) -> let v1 = eval_ e1 env in
+                    case rest of
+                      [] -> LL [v1]
+                      _  -> mycons v1 $ eval_ (LIST rest) env
   IF c t f-> case eval_ c env of
       BB True  -> eval_ t env
       BB False -> eval_ f env
@@ -49,6 +57,7 @@ orr   v1 v2 = let (BB a,BB b) = (v1,v2) in BB $ a||b
 equ   v1 v2 = case (v1,v2) of
                 (NN a,NN b) -> BB $ a==b
                 (BB a,BB b) -> BB $ a==b
+mycons v1 l2 = let (LL rest) = l2 in LL $ v1 : rest
 
 envLook :: EXP -> ENV -> VALUE
 envLook (VAR str) env =
@@ -61,5 +70,5 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  print $ eval.parse.scanTokens $ "let rec (f:Int->Int) x = if x==0 then 1 else if x==1 then 1 else f(x-1) + f(x-2) in f 6"
+  print $ eval.parse.scanTokens $ "[1,2,3]"
   print 0

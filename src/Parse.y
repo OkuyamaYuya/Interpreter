@@ -17,6 +17,8 @@ import qualified Token as T
   var { T.Var $$ }
   '(' { T.Lparen }
   ')' { T.Rparen }
+  '[' { T.Lparen2 }
+  ']' { T.Rparen2 }
   '-' { T.Minus }
   '+' { T.Plus }
   '*' { T.Times }
@@ -30,12 +32,14 @@ import qualified Token as T
   in { T.In }
   rec { T.Rec }
   '.' { T.Dot }
+  ',' { T.Comma }
   ':' { T.Colon }
   '=' { T.Assign }
   '->' { T.Arrow }
   lambda { T.Lambda }
   tyInt { T.TyInt }
   tyBool { T.TyBool }
+  tyList { T.TyList}
 
 %right in '->'
 %left '+' '-'
@@ -48,7 +52,7 @@ Main : Exp { $1 }
 Exp : Exp_ { $1 }
      | Exp Exp_ { S.APP $1 $2 }
 
-Exp_ : Exp '+' Exp             { S.PLUS  $1  $3 }
+Exp_ : Exp '+' Exp            { S.PLUS  $1  $3 }
     | Exp '-' Exp             { S.MINUS $1  $3 }
     | Exp '*' Exp             { S.TIMES $1  $3 }
     | Exp '&&' Exp            { S.AND   $1  $3 }
@@ -62,9 +66,14 @@ Exp_ : Exp '+' Exp             { S.PLUS  $1  $3 }
     | if Exp then Exp else Exp              { S.IF $2 $4 $6 }
     | let rec var var ':' Type '=' Exp in Exp { S.REC $3 $6 $4 $8 $10 }
     | let var ':' Type '=' Exp in Exp       { S.BIND $2 $4 $6 $8 }
+    | '[' Sequence  ']' { S.LIST $2 }
+
+Sequence : Exp  { [$1] }
+         | Exp ',' Sequence { $1 : $3 }
 
 Type : tyInt  { S.INT }
      | tyBool { S.BOOL }
+     | tyList Type { S.LISTtype $2 }
      | Type '->' Type { S.FUN $1 $3 }
      | '(' Type ')'   { $2 }
 

@@ -18,6 +18,12 @@ tycheck_ = \e -> \env -> case e of
   NAT n -> INT
   B   b -> BOOL
   VAR x -> envLook (VAR x) env
+  LIST (e1:rest) -> let t1 = tycheck_ e1 env in
+                    case rest of
+                      [] -> LISTtype t1
+                      _  -> if LISTtype t1 == tycheck_ (LIST rest) env
+                            then LISTtype t1 
+                            else BOTTOM "List type error"
   IF e1 e2 e3 -> let t1 = tycheck_ e1 env in
                  let t2 = tycheck_ e2 env in
                  let t3 = tycheck_ e3 env in
@@ -53,7 +59,7 @@ tycheck_ = \e -> \env -> case e of
                   if t1 == (tycheck_ e2 env) && t1 == BOOL 
                     then BOOL 
                     else BOTTOM "(||)::BOOL->BOOL->BOOL"
-  _ -> BOTTOM ""
+  _ -> BOTTOM "error"
 
 envLook :: EXP -> ENV_ty -> TY
 envLook (VAR str) env =
@@ -66,8 +72,6 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  print $ tycheck.parse.scanTokens $ "let rec (f:Int->Int) x = if x == 0 then 1 else if x==1 then 1 else 0 in f 6"
-  print $ tycheck.parse.scanTokens $ "let rec (f:Int->Int) x = f (x-1) in f 6"
-  print $ tycheck.parse.scanTokens $ "\\x:Int.x"
-  print $ tycheck.parse.scanTokens $ "let x:Int = if True then 1 else 0 in x + 100"
+  print $ tycheck.parse.scanTokens $ "[1,2,3]"
+  print $ tycheck.parse.scanTokens $ "[1,2,3,let x:Int = 1 in x]"
   print 0

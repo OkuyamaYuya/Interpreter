@@ -15,14 +15,18 @@ data Token = Let
            | Div
            | Lparen
            | Rparen
+           | Lparen2
+           | Rparen2
            | If
            | Then
            | Else
            | TyInt
            | TyBool
+           | TyList
            | Arrow
            | Lambda
            | Dot
            | Colon
+           | Comma
            | Assign
            deriving (Show,Eq)

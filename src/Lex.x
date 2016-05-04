@@ -15,6 +15,8 @@ tokens :-
     $white+ ;
     "(" { \s -> T.Lparen }
     ")" { \s -> T.Rparen }
+    "[" { \s -> T.Lparen2 }
+    "]" { \s -> T.Rparen2 }
     "True" { \s -> T.Bool True }
     "False" { \s -> T.Bool False }
     $digit+ { \s -> T.Int (read s) }
@@ -33,8 +35,10 @@ tokens :-
     "\" { \s -> T.Lambda }
     "Int" { \s -> T.TyInt }
     "Bool" { \s -> T.TyBool }
+    "List" { \s -> T.TyList }
     "->" { \s -> T.Arrow }
     "." { \s -> T.Dot }
+    "," { \s -> T.Comma }
     ":" { \s -> T.Colon }
     "=" { \s -> T.Assign }
     $lower [$alpha $digit \_ \’]* { \s -> T.Var s }

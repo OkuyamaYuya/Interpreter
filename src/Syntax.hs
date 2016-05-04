@@ -2,6 +2,7 @@ module Syntax where
 
 data TY  = INT 
          | BOOL 
+         | LISTtype TY
          | FUN TY TY 
          | BOTTOM String 
            deriving (Show,Read,Eq)
@@ -16,6 +17,7 @@ data EXP = NAT Int
          | AND  EXP EXP
          | OR EXP EXP
          | APP EXP EXP
+         | LIST [EXP]
          | IF {cond::EXP, tru::EXP, fal::EXP} 
          | ABS {var::String, ty::TY, e::EXP} 
          | BIND {var::String, ty::TY, e::EXP, in_::EXP}
