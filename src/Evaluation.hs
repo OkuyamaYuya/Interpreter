@@ -30,6 +30,9 @@ eval_ = \e -> \env -> case e of
                     case rest of
                       [] -> LL [v1]
                       _  -> mycons v1 $ eval_ (LIST rest) env
+  GET e1 e2 -> let LL lst = eval_ e1 env in
+               let NN n   = eval_ e2 env in
+               lst!!n
   IF c t f-> case eval_ c env of
       BB True  -> eval_ t env
       BB False -> eval_ f env
@@ -70,5 +73,5 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  print $ eval.parse.scanTokens $ "[1,2,3]"
+  print $ eval.parse.scanTokens $ "[1,2,3][2]"
   print 0

@@ -18,6 +18,7 @@ data EXP = NAT Int
          | OR EXP EXP
          | APP EXP EXP
          | LIST [EXP]
+         | GET EXP EXP
          | IF {cond::EXP, tru::EXP, fal::EXP} 
          | ABS {var::String, ty::TY, e::EXP} 
          | BIND {var::String, ty::TY, e::EXP, in_::EXP}

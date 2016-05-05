@@ -24,6 +24,12 @@ tycheck_ = \e -> \env -> case e of
                       _  -> if LISTtype t1 == tycheck_ (LIST rest) env
                             then LISTtype t1 
                             else BOTTOM "List type error"
+  GET e1 e2   -> let t1 = tycheck_ e1 env in
+                 if (tycheck_ e2 env) /= INT then BOTTOM "type error : list[i], i must be Int type."
+                 else 
+                    case t1 of
+                      LISTtype a -> a
+                      _ -> BOTTOM "type error : x[i] , x must be LIST."
   IF e1 e2 e3 -> let t1 = tycheck_ e1 env in
                  let t2 = tycheck_ e2 env in
                  let t3 = tycheck_ e3 env in
@@ -72,6 +78,5 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  print $ tycheck.parse.scanTokens $ "[1,2,3]"
-  print $ tycheck.parse.scanTokens $ "[1,2,3,let x:Int = 1 in x]"
+  print $ tycheck.parse.scanTokens $ "[True,True][1]"
   print 0

@@ -67,7 +67,7 @@ Exp_ : Exp '+' Exp            { S.PLUS  $1  $3 }
     | let rec var var ':' Type '=' Exp in Exp { S.REC $3 $6 $4 $8 $10 }
     | let var ':' Type '=' Exp in Exp       { S.BIND $2 $4 $6 $8 }
     | '[' Sequence  ']' { S.LIST $2 }
-
+    | Exp '[' Exp ']'   { S.GET $1 $3 }
 Sequence : Exp  { [$1] }
          | Exp ',' Sequence { $1 : $3 }
 
