@@ -6,6 +6,8 @@ import Lex
 import Base
 import Data.Map as Map
 
+import Debug.Trace
+
 type ENV_ty = Map String TY
 
 tycheckFile = \s -> tycheck.parse.scanTokens <$> readFile s
@@ -37,9 +39,9 @@ tycheck_ = \e -> \env -> case e of
   BIND x t e1 e2 -> let t1 = tycheck_ e1 env in tycheck_ e2 (envAdd x t1 env)
   ABS x t1 e -> let t2 = tycheck_ e (envAdd x t1 env) in FUN t1 t2
   REC f t x e1 e2 -> case t of
-                      FUN dom cod -> let t1 = tycheck_ e1 (envAdd f t . envAdd x cod $ env) in
+                      FUN dom cod -> let t1 = tycheck_ e1 (envAdd f t . envAdd x dom $ env) in
                                      let t2 = tycheck_ e2 (envAdd f t env) in
-                                         if t1==cod then t2 else BOTTOM "REC : codomain"
+                                     if t1 == cod then t2 else BOTTOM "REC : codomain"
   APP e1 e2  -> let t = tycheck_ e1 env in
                   case t of
                     FUN t1 t2 -> let t3 = tycheck_ e2 env in
@@ -54,8 +56,10 @@ tycheck_ = \e -> \env -> case e of
   TIMES e1 e2 -> if (tycheck_ e1 env,tycheck_ e2 env) == (INT,INT) 
                   then INT 
                   else BOTTOM "(*)::INT->INT->INT"
-  EQU e1 e2  -> if (tycheck_ e1 env) == (tycheck_ e2 env) 
-                  then BOOL 
+  EQU e1 e2  ->   let t1 = tycheck_ e1 env in
+                  let t2 = tycheck_ e2 env in
+                  if t1 == t2
+                  then BOOL
                   else BOTTOM "(==)::a->a->BOOL"
   AND e1 e2  -> let t1 = tycheck_ e1 env in
                   if t1 == (tycheck_ e2 env) && t1 == BOOL 
@@ -78,5 +82,5 @@ envAdd x e env = Map.insert x e env
 
 main :: IO()
 main = do
-  print $ tycheck.parse.scanTokens $ "[True,True][1]"
+  print $ tycheck.parse.scanTokens $ "let rec f n : Int -> List Int = if n == 0 then [0,0,0,0] else [1,2,3,4] in (f 3)[2]"
   print 0
