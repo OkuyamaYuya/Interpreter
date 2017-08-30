@@ -7,4 +7,4 @@ let rec fib n : Int -> List Int =
     let x2 : Int = l[1] in
     [x1+x2,x1]
   in
-    fib 30
+    (fib 10)[0]
